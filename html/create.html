@@ -1,0 +1,50 @@
+<div ng-controller="AppCtrl" layout="column" ng-cloak>
+
+    <md-content layout-padding>
+        <form name="projectForm">
+            <md-input-container class="md-block">
+                <label>Headline</label>
+                <input md-maxlength="100" md-no-asterisk name="headline" ng-model="project.headline" required>
+                <div ng-messages="projectForm.headline.$error">
+                    <div ng-message="required">This is required.</div>
+                    <div ng-message="md-maxlength">The description must be less than 100 characters long.</div>
+                </div>
+            </md-input-container>
+
+            <md-input-container class="md-block">
+                <label>Body</label>
+                <textarea md-maxlength="1000" rows="5" md-select-on-focus ng-model="project.body" required></textarea>
+            </md-input-container>
+
+            <md-input-container class="md-block">
+                <label>Image Link (URL)</label>
+                <input ng-model="project.imageUrl" name="imageUrl" type="url" required>
+                <div ng-messages="projectForm.imageUrl.$error">
+                    <div ng-message="required">This is required.</div>
+                </div>
+            </md-input-container>
+
+            <md-input-container class="md-block">
+                <label>News source (URL)</label>
+                <input ng-model="project.newsUrl" name="sourceUrl" type="url" required>
+                <div ng-messages="projectForm.sourceUrl.$error">
+                    <div ng-message="required">This is required.</div>
+                </div>
+            </md-input-container>
+
+            <md-input-container class="md-block" flex-gt-sm>
+                <label>Category</label>
+                <md-select ng-model="project.category">
+                    <md-option ng-repeat="category in categories" value="{{category.text}}">
+                        {{category.text}}
+                    </md-option>
+                </md-select>
+            </md-input-container>
+
+            <div ng-click="submit()">
+                <md-button type="submit">Submit</md-button>
+            </div>
+
+        </form>
+    </md-content>
+</div>

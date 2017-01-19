@@ -1,8 +1,8 @@
 <div ng-controller="PaosCtrl" ng-cloak>
-    <ul class="no-style">
-        <li ng-repeat="pao in paos">
+    <md-list>
+        <md-list-item ng-repeat="pao in paos">
             <md-content class="md-padding" layout-xs="column" layout="row">
-                <div flex-xs flex-gt-xs="50" layout="column">
+                <div flex-xs flex-gt-md="50" layout="column">
                     <md-card>
                         <img ng-src="{{pao.imageUrl}}" class="md-card-image" alt="PAO MACHA">
                         <md-card-title>
@@ -15,16 +15,18 @@
                                 {{pao.body}}
                             </p>
                             <p>
-                                PAO MACHA by {{pao.createdBy}} / {{-pao.createdOn | date:'medium' }}
+                                <span class="md-caption">PAO MACHA by {{pao.createdBy}} / {{-pao.createdOn | date:'medium' }} </span>
                             </p>
                         </md-card-content>
-                        <md-card-actions layout="row" layout-align="end center">
-                            <md-button>LIKE</md-button>
-                            <md-button>SHARE</md-button>
+                        <md-card-actions layout="row">
+                            <md-button class="md-primary" href="{{pao.originalNewsUrl}}" target="_blank">News details</md-button>
+                            <span flex></span>
+                            <md-button ng-click="like()" class="md-primary">LIKE</md-button>
+                            <md-button ng-click="dislike()" class="md-primary">DISLIKE</md-button>
                         </md-card-actions>
                     </md-card>
                 </div>
             </md-content>
-        </li>
-    </ul>
+        </md-list-item>
+    </md-list>
 </div>

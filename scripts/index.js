@@ -58,18 +58,16 @@ app.service('userService', function(){
 });
 
 app.controller('appLogin', function($scope, userService, $mdSidenav) {
-
     $scope.openMenu = function() {
-    $mdSidenav('left').toggle();
-  };
+        $mdSidenav('left').toggle();
+    };
 
-    var US = userService;
     var authProvider = new firebase.auth.GoogleAuthProvider();
     $scope.authenticateWithGoogle = function() {
         firebase.auth().signInWithPopup(authProvider).then(function(result) {
             $scope.userInfo = result;
             console.log(result);
-            US.setUserInfo(result);
+            userService.setUserInfo(result);
             var token = result.credential.accessToken;
             var user = result.user;
 
@@ -119,7 +117,7 @@ app.controller('AppCtrl', function($scope, userService) {
             var uuidKey= pushRef.key;
 
              var email = userService.getUserInfo().user.email || 'Not available';
-             var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com"];
+             var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com", "chandisana@gmail.com"];
              var needsApproval = admins.lastIndexOf(email)<0;
 
             console.info('uuidKey' + uuidKey)
@@ -158,14 +156,24 @@ app.controller("PaosCtrl", function($scope, $firebaseArray) {
   var ref = database.ref('prod/frompao').orderByChild('createdOn');
   // create a synchronized array
   $scope.paos = $firebaseArray(ref);
+
+  $scope.like = function() {
+      $mdSidenav('left').toggle();
+  };
+
 });
 
 app.controller("PaosByMeCtrl", function($scope, $firebaseArray, userService) {
     var email = userService.getUserInfo().user.email || 'Not available';
-console.log("email" + email);
-  var ref = database.ref('prod/frompao').orderByChild('createdOn').equalTo(email, 'createdBy');
-  // create a synchronized array
-  $scope.paos = $firebaseArray(ref);
+    console.log("email:" + email);
+    var ref = database.ref('prod/frompao').orderByChild('createdBy').equalTo(email);
+    $scope.paosbyme = $firebaseArray(ref);
+    var list = $scope.paosbyme;
+    list.$save($scope.pao).then(function(ref) {
+      alert('update' + $scope.pao);
+      ref.key() === $scope.pao.$uuid; // true
+    });
+    console.log("paos " + $scope.paosbyme);
 });
 
 

@@ -1,30 +1,36 @@
 <div ng-controller="PaosByMeCtrl" ng-cloak>
-    <ul>
-        <li ng-repeat="pao in paos">
+    <md-list>
+        <md-list-item ng-repeat="pao in paosbyme">
             <md-content class="md-padding" layout-xs="column" layout="row">
-                <div flex-xs flex-gt-xs="50" layout="column">
+                <div flex-xs layout="column">
                     <md-card>
                         <img ng-src="{{pao.imageUrl}}" class="md-card-image" alt="PAO MACHA">
                         <md-card-title>
                             <md-card-title-text>
-                                <span class="md-headline">{{pao.title}}</span>
+                                <input class="md-headline" ng-model="pao.title">
                             </md-card-title-text>
                         </md-card-title>
                         <md-card-content>
+                            <md-input-container class="md-block">
+                                <textarea md-maxlength="1000" rows="5" ng-model="pao.body"></textarea>
+                            </md-input-container>
+                            <md-input-container class="md-block">
+                                <input ng-model="pao.imageUrl">
+                            </md-input-container>
+                            <md-input-container class="md-block">
+                                <input ng-model="pao.originalNewsUrl">
+                            </md-input-container>
+
                             <p>
-                                {{pao.body}}
-                            </p>
-                            <p>
-                                PAO MACHA by {{pao.createdBy}} / {{pao.createdOn}}
+                                <span class="md-caption">PAO MACHA by {{pao.createdBy}} / {{-pao.createdOn | date:'medium' }} </span>
                             </p>
                         </md-card-content>
                         <md-card-actions layout="row" layout-align="end center">
-                            <md-button>LIKE</md-button>
-                            <md-button>SHARE</md-button>
+                            <md-button ng-model="pao" ng-click="paosbyme.$save(pao)" class="md-primary">Update</md-button>
                         </md-card-actions>
                     </md-card>
                 </div>
             </md-content>
-        </li>
-    </ul>
+        </md-list-item>
+    </md-list>
 </div>

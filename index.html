@@ -50,12 +50,14 @@
     </div>
 </md-toolbar>
 <section layout="row" flex>
-    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left">
-        <md-list>
-            <md-list-item ng-repeat="menu in ['Compose', 'All News', 'Compose by me', 'Categories']" ng-href="#/{{menu}}">
-                {{menu}}
-            </md-list-item>
-        </md-list>
+    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" class="md-sidenav-left" md-whiteframe="4">
+        <md-content layout-margin>
+            <md-list>
+                <md-list-item ng-repeat="menu in ['Compose', 'All News', 'Compose by me', 'Categories']" ng-href="#/{{menu}}">
+                    {{menu}}
+                </md-list-item>
+            </md-list>
+        </md-content>
     </md-sidenav>
     <section flex>
         <ng-view></ng-view>

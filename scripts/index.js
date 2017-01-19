@@ -8,51 +8,81 @@ var config = {
 };
 firebase.initializeApp(config);
 var database = firebase.database();
+var app = angular.module('MyApp', ['ngMaterial', 'ngRoute', 'ngMessages', 'firebase']);
 
-
-var app = angular.module('MyApp', ['ngMaterial', 'ngRoute', 'ngMessages']);
+app.config(function($mdThemingProvider){
+    $mdThemingProvider.theme('default')
+        .primaryPalette('teal', {
+          'default': '500', // by default use shade 400 from the pink palette for primary intentions
+          'hue-1': '100', // use shade 100 for the <code>md-hue-1</code> class
+          'hue-2': '600', // use shade 600 for the <code>md-hue-2</code> class
+          'hue-3': 'A100' // use shade A100 for the <code>md-hue-3</code> class
+        })
+        // If you specify less than all of the keys, it will inherit from the
+        // default shades
+        .accentPalette('pink', {
+          'default': '200' // use shade 200 for default, and keep all other shades the same
+        });
+});
 
 app.config(function($routeProvider) {
     $routeProvider
         .when('/', {
-            template: 'App Initialized'
+            templateUrl: 'html/news.html'
         })
-        .when('/linkCompose', {
+        .when('/Compose', {
             templateUrl: 'html/create.html'
         })
-        .when('/link2', {
-            template: 'Page 2'
+        .when('/All News', {
+            templateUrl: 'html/news.html'
         })
-        .when('/link3', {
-            template: 'Page 3'
+        .when('/Compose by me', {
+            templateUrl: 'html/newsbyme.html'
         })
-        .when('/link4', {
-            template: 'Page 4'
+        .when('/Categories', {
+            templateUrl: 'html/categories.html'
         })
         .otherwise({
             template: 'Page Not Found!'
         });
 });
 
-app.controller('appLogin', function($scope) {
+app.service('userService', function(){
+    this.userInfo;
+    this.setUserInfo = function(userInfo){
+        this.userInfo = userInfo;
+    }
+    this.getUserInfo = function(){
+        return this.userInfo;
+    }
+});
+
+app.controller('appLogin', function($scope, userService, $mdSidenav) {
+
+    $scope.openMenu = function() {
+    $mdSidenav('left').toggle();
+  };
+
+    var US = userService;
     var authProvider = new firebase.auth.GoogleAuthProvider();
     $scope.authenticateWithGoogle = function() {
         firebase.auth().signInWithPopup(authProvider).then(function(result) {
             $scope.userInfo = result;
-
+            console.log(result);
+            US.setUserInfo(result);
             var token = result.credential.accessToken;
             var user = result.user;
 
             var categoriesRef = database.ref('prod/categories');
             // Make sure we remove all previous listeners.
             categoriesRef.off();
-            var childData;
             categoriesRef.once('value', function(snapshot) {
                 snapshot.forEach(function(childSnapshot) {
                     var childKey = childSnapshot.key;
                     console.log("childKey " + childKey);
-                    childData = childSnapshot.val();
+                    var childData = childSnapshot.val();
                     console.log("childData " + childData);
+                    $scope.categoriesAsString = childData;
                     $scope.categories = (childData).split(',').map(function(category) {
                       return {text: category};
                     });
@@ -79,7 +109,7 @@ app.controller('appLogin', function($scope) {
     }
 });
 
-app.controller('AppCtrl', function($scope) {
+app.controller('AppCtrl', function($scope, userService) {
     $scope.submit = function() {
         var currentUser = firebase.auth().currentUser;
         if (currentUser) {
@@ -87,6 +117,11 @@ app.controller('AppCtrl', function($scope) {
             var messageCreatedOn= -1 * new Date().getTime();
             var pushRef = messagesRef.push();
             var uuidKey= pushRef.key;
+
+             var email = userService.getUserInfo().user.email || 'Not available';
+             var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com"];
+             var needsApproval = admins.lastIndexOf(email)<0;
+
             console.info('uuidKey' + uuidKey)
             pushRef.set({
                 createdBy: currentUser.email,
@@ -99,7 +134,7 @@ app.controller('AppCtrl', function($scope) {
                 uuid: uuidKey,
                 disLikes: 0,
                 likes: 0,
-                needsApproval: 'false',
+                needsApproval: ''+needsApproval,
                 tags: [$scope.project.category]
             }).then(function() {
                   $scope = $scope.$new(true);
@@ -117,6 +152,20 @@ app.controller('AppCtrl', function($scope) {
     $scope.project = {
         //headline: 'prefill value'
     };
+});
+
+app.controller("PaosCtrl", function($scope, $firebaseArray) {
+  var ref = database.ref('prod/frompao').orderByChild('createdOn');
+  // create a synchronized array
+  $scope.paos = $firebaseArray(ref);
+});
+
+app.controller("PaosByMeCtrl", function($scope, $firebaseArray, userService) {
+    var email = userService.getUserInfo().user.email || 'Not available';
+console.log("email" + email);
+  var ref = database.ref('prod/frompao').orderByChild('createdOn').equalTo(email, 'createdBy');
+  // create a synchronized array
+  $scope.paos = $firebaseArray(ref);
 });
 
 

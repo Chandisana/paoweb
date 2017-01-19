@@ -1,0 +1,6 @@
+.no-style{
+    padding:0;
+}
+.no-style li{
+    list-style : none;
+}

@@ -1,0 +1,30 @@
+<div ng-controller="PaosByMeCtrl" ng-cloak>
+    <ul>
+        <li ng-repeat="pao in paos">
+            <md-content class="md-padding" layout-xs="column" layout="row">
+                <div flex-xs flex-gt-xs="50" layout="column">
+                    <md-card>
+                        <img ng-src="{{pao.imageUrl}}" class="md-card-image" alt="PAO MACHA">
+                        <md-card-title>
+                            <md-card-title-text>
+                                <span class="md-headline">{{pao.title}}</span>
+                            </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                            <p>
+                                {{pao.body}}
+                            </p>
+                            <p>
+                                PAO MACHA by {{pao.createdBy}} / {{pao.createdOn}}
+                            </p>
+                        </md-card-content>
+                        <md-card-actions layout="row" layout-align="end center">
+                            <md-button>LIKE</md-button>
+                            <md-button>SHARE</md-button>
+                        </md-card-actions>
+                    </md-card>
+                </div>
+            </md-content>
+        </li>
+    </ul>
+</div>

@@ -8,20 +8,23 @@ var config = {
 };
 firebase.initializeApp(config);
 var database = firebase.database();
+var auth = firebase.auth();
+auth.onAuthStateChanged()
+
 var app = angular.module('MyApp', ['ngMaterial', 'ngRoute', 'ngMessages', 'firebase']);
 
-app.config(function($mdThemingProvider){
+app.config(function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
         .primaryPalette('teal', {
-          'default': '500', // by default use shade 400 from the pink palette for primary intentions
-          'hue-1': '100', // use shade 100 for the <code>md-hue-1</code> class
-          'hue-2': '600', // use shade 600 for the <code>md-hue-2</code> class
-          'hue-3': 'A100' // use shade A100 for the <code>md-hue-3</code> class
+            'default': '500', // by default use shade 400 from the pink palette for primary intentions
+            'hue-1': '100', // use shade 100 for the <code>md-hue-1</code> class
+            'hue-2': '600', // use shade 600 for the <code>md-hue-2</code> class
+            'hue-3': 'A100' // use shade A100 for the <code>md-hue-3</code> class
         })
         // If you specify less than all of the keys, it will inherit from the
         // default shades
-        .accentPalette('pink', {
-          'default': '200' // use shade 200 for default, and keep all other shades the same
+        .accentPalette('lime', {
+            'default': '200' // use shade 200 for default, and keep all other shades the same
         });
 });
 
@@ -47,12 +50,12 @@ app.config(function($routeProvider) {
         });
 });
 
-app.service('userService', function(){
+app.service('userService', function() {
     this.userInfo;
-    this.setUserInfo = function(userInfo){
+    this.setUserInfo = function(userInfo) {
         this.userInfo = userInfo;
     }
-    this.getUserInfo = function(){
+    this.getUserInfo = function() {
         return this.userInfo;
     }
 });
@@ -61,6 +64,15 @@ app.controller('appLogin', function($scope, userService, $mdSidenav) {
     $scope.openMenu = function() {
         $mdSidenav('left').toggle();
     };
+    /*$scope.authenticateWithGoogle = function() {
+        $scope.authObj.$signInWithPopup("google").then(function(authData) {
+          console.log("Logged in as:", authData);
+          $scope.userInfo = authData;
+          userService.setUserInfo(authData);
+        }).catch(function(error) {
+          console.error("Authentication failed:", error);
+        });
+    }*/
 
     var authProvider = new firebase.auth.GoogleAuthProvider();
     $scope.authenticateWithGoogle = function() {
@@ -82,7 +94,9 @@ app.controller('appLogin', function($scope, userService, $mdSidenav) {
                     console.log("childData " + childData);
                     $scope.categoriesAsString = childData;
                     $scope.categories = (childData).split(',').map(function(category) {
-                      return {text: category};
+                        return {
+                            text: category
+                        };
                     });
                 });
             });
@@ -112,13 +126,13 @@ app.controller('AppCtrl', function($scope, userService) {
         var currentUser = firebase.auth().currentUser;
         if (currentUser) {
             var messagesRef = database.ref('prod/frompao');
-            var messageCreatedOn= -1 * new Date().getTime();
+            var messageCreatedOn = -1 * new Date().getTime();
             var pushRef = messagesRef.push();
-            var uuidKey= pushRef.key;
+            var uuidKey = pushRef.key;
 
-             var email = userService.getUserInfo().user.email || 'Not available';
-             var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com", "chandisana@gmail.com"];
-             var needsApproval = admins.lastIndexOf(email)<0;
+            var email = userService.getUserInfo().user.email || 'Not available';
+            var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com", "chandisana@gmail.com"];
+            var needsApproval = admins.lastIndexOf(email) < 0;
 
             console.info('uuidKey' + uuidKey)
             pushRef.set({
@@ -132,15 +146,15 @@ app.controller('AppCtrl', function($scope, userService) {
                 uuid: uuidKey,
                 disLikes: 0,
                 likes: 0,
-                needsApproval: ''+needsApproval,
+                needsApproval: '' + needsApproval,
                 tags: [$scope.project.category]
             }).then(function() {
-                  $scope = $scope.$new(true);
-                  $scope.$apply();
-                  alert('Posted!')
-              }, function() {
-                  console.log("Error while creating news!");
-              });
+                $scope = $scope.$new(true);
+                $scope.$apply();
+                alert('Posted!')
+            }, function() {
+                console.log("Error while creating news!");
+            });
 
         } else {
             alert('Please log in before posting!')
@@ -153,13 +167,13 @@ app.controller('AppCtrl', function($scope, userService) {
 });
 
 app.controller("PaosCtrl", function($scope, $firebaseArray) {
-  var ref = database.ref('prod/frompao').orderByChild('createdOn');
-  // create a synchronized array
-  $scope.paos = $firebaseArray(ref);
+    var ref = database.ref('prod/frompao').orderByChild('createdOn');
+    // create a synchronized array
+    $scope.paos = $firebaseArray(ref);
 
-  $scope.like = function() {
-      $mdSidenav('left').toggle();
-  };
+    $scope.like = function() {
+        $mdSidenav('left').toggle();
+    };
 
 });
 
@@ -170,8 +184,8 @@ app.controller("PaosByMeCtrl", function($scope, $firebaseArray, userService) {
     $scope.paosbyme = $firebaseArray(ref);
     var list = $scope.paosbyme;
     list.$save($scope.pao).then(function(ref) {
-      alert('update' + $scope.pao);
-      ref.key() === $scope.pao.$uuid; // true
+        alert('update' + $scope.pao);
+        ref.key() === $scope.pao.$uuid; // true
     });
     console.log("paos " + $scope.paosbyme);
 });

@@ -1,4 +1,3 @@
-// Initialize Firebase
 var config = {
     apiKey: "AIzaSyDS2WE1Utokaf2G-ZC1OorDFFFttT8pF9M",
     authDomain: "paomacha2017.firebaseapp.com",
@@ -9,40 +8,37 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 var auth = firebase.auth();
-auth.onAuthStateChanged()
 
 var app = angular.module('MyApp', ['ngMaterial', 'ngRoute', 'ngMessages', 'firebase']);
 
 app.config(function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
         .primaryPalette('teal', {
-            'default': '500', // by default use shade 400 from the pink palette for primary intentions
-            'hue-1': '100', // use shade 100 for the <code>md-hue-1</code> class
-            'hue-2': '600', // use shade 600 for the <code>md-hue-2</code> class
-            'hue-3': 'A100' // use shade A100 for the <code>md-hue-3</code> class
+            'default': '500',
+            'hue-1': '100',
+            'hue-2': '600',
+            'hue-3': 'A100'
         })
-        // If you specify less than all of the keys, it will inherit from the
-        // default shades
         .accentPalette('lime', {
-            'default': '200' // use shade 200 for default, and keep all other shades the same
+            'default': '200'
         });
 });
 
 app.config(function($routeProvider) {
     $routeProvider
         .when('/', {
-            templateUrl: 'html/news.html'
+            templateUrl: 'html/welcome.html'
         })
-        .when('/Compose', {
+        .when('/compose', {
             templateUrl: 'html/create.html'
         })
-        .when('/All News', {
+        .when('/all', {
             templateUrl: 'html/news.html'
         })
-        .when('/Compose by me', {
+        .when('/me', {
             templateUrl: 'html/newsbyme.html'
         })
-        .when('/Categories', {
+        .when('/cat', {
             templateUrl: 'html/categories.html'
         })
         .otherwise({
@@ -54,74 +50,66 @@ app.service('userService', function() {
     this.userInfo;
     this.setUserInfo = function(userInfo) {
         this.userInfo = userInfo;
+        console.log('setUserinfo ' + this.userInfo)
     }
     this.getUserInfo = function() {
+        console.log('getUserinfo ' + this.userInfo)
         return this.userInfo;
     }
 });
 
-app.controller('appLogin', function($scope, userService, $mdSidenav) {
+app.controller("AppSignin", function($scope, $firebaseAuth, userService, $mdToast, $mdSidenav) {
     $scope.openMenu = function() {
         $mdSidenav('left').toggle();
     };
-    /*$scope.authenticateWithGoogle = function() {
+     var categoriesRef = database.ref('prod/categories');
+     categoriesRef.off();
+     categoriesRef.once('value', function(snapshot) {
+         snapshot.forEach(function(childSnapshot) {
+             var childKey = childSnapshot.key;
+             var childData = childSnapshot.val();
+             console.log("childData " + childData);
+             $scope.categoriesAsString = childData;
+             $scope.categories = (childData).split(',').map(function(category) {
+                 return {
+                     text: category
+                 };
+             });
+         });
+     });
+
+    $scope.authObj = $firebaseAuth();
+    $scope.signin = function() {
         $scope.authObj.$signInWithPopup("google").then(function(authData) {
-          console.log("Logged in as:", authData);
-          $scope.userInfo = authData;
-          userService.setUserInfo(authData);
+            $scope.authData = authData;
+            console.log("Signin in as:", authData);
         }).catch(function(error) {
-          console.error("Authentication failed:", error);
+            $scope.authData = undefined;
+            console.error("Signin failed:", error);
         });
-    }*/
+    };
 
-    var authProvider = new firebase.auth.GoogleAuthProvider();
-    $scope.authenticateWithGoogle = function() {
-        firebase.auth().signInWithPopup(authProvider).then(function(result) {
-            $scope.userInfo = result;
-            console.log(result);
-            userService.setUserInfo(result);
-            var token = result.credential.accessToken;
-            var user = result.user;
-
-            var categoriesRef = database.ref('prod/categories');
-            // Make sure we remove all previous listeners.
-            categoriesRef.off();
-            categoriesRef.once('value', function(snapshot) {
-                snapshot.forEach(function(childSnapshot) {
-                    var childKey = childSnapshot.key;
-                    console.log("childKey " + childKey);
-                    var childData = childSnapshot.val();
-                    console.log("childData " + childData);
-                    $scope.categoriesAsString = childData;
-                    $scope.categories = (childData).split(',').map(function(category) {
-                        return {
-                            text: category
-                        };
-                    });
-                });
-            });
-
-            $scope.$apply();
-
-        }).catch(function(error) {
-            console.log('Error ' + error);
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            var email = error.email;
-            var credential = error.credential;
-        });
-    }
-    $scope.signOut = function() {
+    $scope.signout = function() {
         firebase.auth().signOut().then(function() {
-            $scope.userInfo = undefined;
+            $scope.authData = undefined;
             $scope.$apply();
         }, function() {
             console.log("Error while signing out!");
         });
-    }
-});
+    };
 
-app.controller('AppCtrl', function($scope, userService) {
+    $scope.authObj.$onAuthStateChanged(function(authData) {
+        if (authData) {
+            $scope.authData = authData;
+            userService.setUserInfo($scope.authData.email);
+            console.log("AuthData in as:", authData);
+        } else {
+            $scope.authData = undefined;
+            userService.setUserInfo(undefined);
+            console.log("AuthData out");
+        }
+    });
+
     $scope.submit = function() {
         var currentUser = firebase.auth().currentUser;
         if (currentUser) {
@@ -130,8 +118,8 @@ app.controller('AppCtrl', function($scope, userService) {
             var pushRef = messagesRef.push();
             var uuidKey = pushRef.key;
 
-            var email = userService.getUserInfo().user.email || 'Not available';
-            var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com", "chandisana@gmail.com"];
+            var email = userService.getUserInfo() || 'Not available';
+            var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com", "chandisana@gmail.com", "rajnong@gmail.com"];
             var needsApproval = admins.lastIndexOf(email) < 0;
 
             console.info('uuidKey' + uuidKey)
@@ -149,37 +137,33 @@ app.controller('AppCtrl', function($scope, userService) {
                 needsApproval: '' + needsApproval,
                 tags: [$scope.project.category]
             }).then(function() {
-                $scope = $scope.$new(true);
+                $scope.project = {
+                    headline: ' ',
+                    imageUrl: 'http://www.itservz.com',
+                    body: ' ',
+                    newsUrl: 'http://www.itservz.com'
+                };
                 $scope.$apply();
-                alert('Posted!')
+                $mdToast.show(
+                  $mdToast.simple()
+                    .textContent('You have posted the news. Go to Compose by me to edit.')
+                    .hideDelay(5000)
+                );
             }, function() {
                 console.log("Error while creating news!");
             });
-
         } else {
             alert('Please log in before posting!')
         }
     }
-
-    $scope.project = {
-        //headline: 'prefill value'
-    };
-});
-
-app.controller("PaosCtrl", function($scope, $firebaseArray) {
-    var ref = database.ref('prod/frompao').orderByChild('createdOn');
-    // create a synchronized array
-    $scope.paos = $firebaseArray(ref);
-
-    $scope.like = function() {
-        $mdSidenav('left').toggle();
-    };
-
-});
+  });
 
 app.controller("PaosByMeCtrl", function($scope, $firebaseArray, userService) {
-    var email = userService.getUserInfo().user.email || 'Not available';
+    var email =  userService.getUserInfo();
     console.log("email:" + email);
+    if(email == null){
+        return;
+    }
     var ref = database.ref('prod/frompao').orderByChild('createdBy').equalTo(email);
     $scope.paosbyme = $firebaseArray(ref);
     var list = $scope.paosbyme;
@@ -190,11 +174,7 @@ app.controller("PaosByMeCtrl", function($scope, $firebaseArray, userService) {
     console.log("paos " + $scope.paosbyme);
 });
 
-
-/*$scope.authObj.$onAuthStateChanged(function(authData) {
-  if (authData) {
-    console.log("Logged in as:", authData.uid);
-  } else {
-    console.log("Logged out");
-  }
-});*/
+app.controller("PaosCtrl", function($scope, $firebaseArray) {
+    var ref = database.ref('prod/frompao').orderByChild('createdOn').limitToFirst(44);
+    $scope.paos = $firebaseArray(ref);
+});

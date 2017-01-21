@@ -1,6 +1,29 @@
-<div ng-controller="appLogin" class="md-padding" ng-cloak>
-    <p class="inset">
-        Categories are: {{categoriesAsString}}
-    </p>
+<div ng-controller="PaosCtrl" ng-cloak>
+    <md-list>
+        <md-list-item ng-repeat="pao in paos | filter: {tags: cat}">
+            <md-content class="md-padding" layout-xs="column" layout="row">
+                <div flex-xs flex-gt-md="50" layout="column">
+                    <md-card>
+                        <img ng-src="{{pao.imageUrl}}" class="md-card-image" alt="PAO MACHA">
+                        <md-card-title>
+                            <md-card-title-text>
+                                <span class="md-headline">{{pao.title}}</span>
+                            </md-card-title-text>
+                        </md-card-title>
+                        <md-card-content>
+                            <p>
+                                {{pao.body}}
+                            </p>
+                            <p>
+                                <span class="md-caption">PAO MACHA by {{pao.createdBy}} / {{-pao.createdOn | date:'medium' }} </span>
+                            </p>
+                        </md-card-content>
+                        <md-card-actions layout="row" layout-align="end center">
+                            <md-button class="md-primary" href="{{pao.originalNewsUrl}}" target="_blank">News details</md-button>
+                        </md-card-actions>
+                    </md-card>
+                </div>
+            </md-content>
+        </md-list-item>
+    </md-list>
 </div>
-

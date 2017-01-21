@@ -1,4 +1,4 @@
-<div ng-controller="AppCtrl" layout="column" ng-cloak>
+<div ng-controller="AppSignin" layout="column" ng-cloak>
 
     <md-content layout-padding>
         <form name="projectForm">
@@ -13,7 +13,7 @@
 
             <md-input-container class="md-block">
                 <label>Body</label>
-                <textarea md-maxlength="1000" rows="5" md-select-on-focus ng-model="project.body" required></textarea>
+                <textarea md-maxlength="700" rows="5" md-select-on-focus ng-model="project.body" required></textarea>
             </md-input-container>
 
             <md-input-container class="md-block">
@@ -41,8 +41,8 @@
                 </md-select>
             </md-input-container>
 
-            <div ng-click="submit()">
-                <md-button type="submit">Submit</md-button>
+            <div layout-align="center">
+                <md-button ng-click="submit()" type="submit" class="md-raised md-primary">Submit</md-button>
             </div>
 
         </form>

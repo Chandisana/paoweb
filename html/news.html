@@ -18,11 +18,8 @@
                                 <span class="md-caption">PAO MACHA by {{pao.createdBy}} / {{-pao.createdOn | date:'medium' }} </span>
                             </p>
                         </md-card-content>
-                        <md-card-actions layout="row">
+                        <md-card-actions layout="row" layout-align="end center">
                             <md-button class="md-primary" href="{{pao.originalNewsUrl}}" target="_blank">News details</md-button>
-                            <span flex></span>
-                            <md-button ng-click="like()" class="md-primary">LIKE</md-button>
-                            <md-button ng-click="dislike()" class="md-primary">DISLIKE</md-button>
                         </md-card-actions>
                     </md-card>
                 </div>

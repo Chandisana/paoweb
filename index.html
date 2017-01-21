@@ -34,29 +34,35 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="styles/index.css" />
 </head>
-<body ng-app="MyApp" ng-cloak layout="column" ng-controller="appLogin">
+<body ng-app="MyApp" ng-cloak layout="column" ng-controller="AppSignin">
 <md-toolbar>
     <div class="md-toolbar-tools">
         <md-button class="md-icon-button" ng-click="openMenu()">
             <md-icon>menu</md-icon>
         </md-button>
-        <h2>PAO MACHA</h2>
+            PAO MACHA
         <span flex></span>
-        <md-button ng-hide="!userInfo" ng-show="userInfo" ng-click="signOut()">Sign-out</md-button>
-        <md-button ng-hide="userInfo" ng-show="!userInfo" ng-click="authenticateWithGoogle()">
+        <span class="md-caption" ng-hide="!authData" ng-show="authData">{{authData.displayName}}</span>
+        <md-button ng-hide="!authData" ng-show="authData" ng-click="signout()">
+                <span class="md-caption">Sign-out</span>
+        </md-button>
+        <md-button class="md-caption" ng-hide="authData" ng-show="!authData" ng-click="signin()">
             <md-icon>account_circle</md-icon>
-            Sign-in with Google
+            <span class="md-caption">Sign-in with Google</span>
         </md-button>
     </div>
 </md-toolbar>
 <section layout="row" flex>
-    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" class="md-sidenav-left" md-whiteframe="4">
-        <md-content layout-margin>
-            <md-list>
-                <md-list-item ng-repeat="menu in ['Compose', 'All News', 'Compose by me', 'Categories']" ng-href="#/{{menu}}">
+    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" md-whiteframe="4">
+        <md-content layout="column">
+            <md-button ng-href="#/all">All News</md-button>
+            <md-button ng-hide="!authData" ng-show="authData" ng-href="#/compose">Compose News</md-button>
+            <md-button ng-hide="!authData" ng-show="authData" ng-href="#/me">Compose by me</md-button>
+            <!--<md-list>
+                <md-list-item ng-repeat="menu in categories" ng-href="#/cat" ng-model="cat">
                     {{menu}}
                 </md-list-item>
-            </md-list>
+            </md-list>-->
         </md-content>
     </md-sidenav>
     <section flex>

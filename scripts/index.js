@@ -120,7 +120,7 @@ app.controller("AppSignin", function($scope, $firebaseAuth, userService, $mdToas
     $scope.submit = function() {
         var currentUser = firebase.auth().currentUser;
         if (currentUser) {
-            var messagesRef = database.ref('test/frompao');
+            var messagesRef = database.ref('prod/frompao');
             var messageCreatedOn = -1 * new Date().getTime();
             var pushRef = messagesRef.push();
             var uuidKey = pushRef.key;

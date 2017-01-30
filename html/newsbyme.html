@@ -1,6 +1,6 @@
 <div ng-controller="PaosByMeCtrl" ng-cloak>
     <md-list>
-        <md-list-item ng-repeat="pao in paosbyme">
+        <md-list-item ng-repeat="pao in paosbyme | orderBy: 'createdOn'">
             <md-content class="md-padding" layout-xs="column" layout="row">
                 <div flex-xs layout="column">
                     <md-card>

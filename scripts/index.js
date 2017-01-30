@@ -58,7 +58,7 @@ app.service('userService', function() {
     }
 });
 
-app.controller("AppSignin", function($scope, $firebaseAuth, userService, $mdToast, $mdSidenav) {
+app.controller("AppSignin", function($scope, $firebaseAuth, userService, $mdToast, $mdSidenav, $firebaseObject) {
     $scope.openMenu = function() {
         $mdSidenav('left').toggle();
     };
@@ -110,17 +110,23 @@ app.controller("AppSignin", function($scope, $firebaseAuth, userService, $mdToas
         }
     });
 
+    //about us
+    $firebaseObject(database.ref('prod/admins')).$loaded().then(function(data){
+        $scope.admins = data.$value;
+    }).catch(function(error){
+        console.error("Admins not found: " + error);
+    });
+
     $scope.submit = function() {
         var currentUser = firebase.auth().currentUser;
         if (currentUser) {
-            var messagesRef = database.ref('prod/frompao');
+            var messagesRef = database.ref('test/frompao');
             var messageCreatedOn = -1 * new Date().getTime();
             var pushRef = messagesRef.push();
             var uuidKey = pushRef.key;
 
             var email = userService.getUserInfo() || 'Not available';
-            var admins = ["customers.itservz@gmail.com", "raju.athokpam@gmail.com", "chandisana@gmail.com", "rajnong@gmail.com"];
-            var needsApproval = admins.lastIndexOf(email) < 0;
+            var needsApproval = $scope.admins.lastIndexOf(email) < 0;
 
             console.info('uuidKey' + uuidKey)
             pushRef.set({
@@ -135,7 +141,7 @@ app.controller("AppSignin", function($scope, $firebaseAuth, userService, $mdToas
                 disLikes: 0,
                 likes: 0,
                 needsApproval: '' + needsApproval,
-                tags: [$scope.project.category]
+                tags: $scope.project.category
             }).then(function() {
                 $scope.project = {
                     headline: ' ',

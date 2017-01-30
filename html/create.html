@@ -34,7 +34,7 @@
 
             <md-input-container class="md-block" flex-gt-sm>
                 <label>Category</label>
-                <md-select ng-model="project.category">
+                <md-select ng-model="project.category" multiple="{{true}}">
                     <md-option ng-repeat="category in categories" value="{{category.text}}">
                         {{category.text}}
                     </md-option>

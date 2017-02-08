@@ -37,10 +37,8 @@
 <body ng-app="MyApp" ng-cloak layout="column" ng-controller="AppSignin">
 <md-toolbar>
     <div class="md-toolbar-tools">
-        <md-button class="md-icon-button" ng-click="openMenu()">
-            <md-icon>menu</md-icon>
-        </md-button>
-            PAO MACHA
+        <img style='height:48px; padding-right:8px' class="md-user-avatar" src="/images/ic_launcher.png" class="md-avatar" alt="" />
+        <h2>PAO MACHA</h2>
         <span flex></span>
         <span class="md-caption" ng-hide="!authData" ng-show="authData">{{authData.displayName}}</span>
         <md-button ng-hide="!authData" ng-show="authData" ng-click="signout()">
@@ -49,6 +47,9 @@
         <md-button class="md-caption" ng-hide="authData" ng-show="!authData" ng-click="signin()">
             <md-icon>account_circle</md-icon>
             <span class="md-caption">Sign-in with Google</span>
+        </md-button>
+        <md-button hide-gt-xs class="md-icon-button" ng-click="openMenu()">
+            <md-icon>menu</md-icon>
         </md-button>
     </div>
 </md-toolbar>
